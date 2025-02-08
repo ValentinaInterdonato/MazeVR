@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Maze VR</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+		<script type="importmap">
+			{
+				"imports": {
+				"three": "https://unpkg.com/three/build/three.module.js",
+				"three/addons/": "https://unpkg.com/three/examples/jsm/"
+				}
+			  }
+		</script>
+		<script type="module" >
+			import * as THREE from 'three';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+			import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
+			let container;
+			let hand1, hand2;
+			let controller1, controller2;
+			let controllerGrip1, controllerGrip2;
+			const tmpVector1 = new THREE.Vector3();
+			const tmpVector2 = new THREE.Vector3();
+			let controls;
+			let grabbing = false;
+			const scaling = {
+				active: false,
+				initialDistance: 0,
+				object: null,
+				initialScale: 1
+			};
+			
+			container = document.createElement( 'div' );
+			document.body.appendChild( container );
+
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			//camera.position.y = 120;
+			//camera.position.z = 0;
+			//camera.lookAt(70, 70, 0);
+			camera.position.x = 0;
+			camera.position.y = 4;
+			camera.position.z = 0;
+			
+			controls = new OrbitControls( camera, container );
+			controls.target.set( 0, 1.6, 0 );
+			controls.update();
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			// is it ok to set animate here b4 definition?
+			//renderer.setAnimationLoop( animate );
+			//document.body.appendChild( renderer.domElement );
+			
+			renderer.xr.enabled = true;
+			container.appendChild( renderer.domElement );
+
+			const sessionInit = {
+				requiredFeatures: [ 'hand-tracking' ]
+			};
+
+			document.body.appendChild( VRButton.createButton( renderer, sessionInit ) );
+
+			// controllers
+
+			controller1 = renderer.xr.getController( 0 );
+			scene.add( controller1 );
+
+			controller2 = renderer.xr.getController( 1 );
+			scene.add( controller2 );
+
+			const controllerModelFactory = new XRControllerModelFactory();
+			const handModelFactory = new XRHandModelFactory();
+
+			// Hand 1
+			controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+			controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+			scene.add( controllerGrip1 );
+
+			hand1 = renderer.xr.getHand( 0 );
+			hand1.addEventListener( 'pinchstart', onPinchStartLeft );
+			hand1.addEventListener( 'pinchend', () => {
+
+				scaling.active = false;
+
+			} );
+			hand1.add( handModelFactory.createHandModel( hand1 ) );
+
+			scene.add( hand1 );
+
+			// Hand 2
+			controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+			controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+			scene.add( controllerGrip2 );
+
+			hand2 = renderer.xr.getHand( 1 );
+			hand2.addEventListener( 'pinchstart', onPinchStartRight );
+			hand2.addEventListener( 'pinchend', onPinchEndRight );
+			hand2.add( handModelFactory.createHandModel( hand2 ) );
+			scene.add( hand2 );
+			
+			function onPinchStartLeft( event ) {
+
+				const controller = event.target;
+
+				if ( grabbing ) {
+
+					const indexTip = controller.joints[ 'index-finger-tip' ];
+					const sphere = collideObject( indexTip );
+
+					if ( sphere ) {
+
+						const sphere2 = hand2.userData.selected;
+						console.log( 'sphere1', sphere, 'sphere2', sphere2 );
+						if ( sphere === sphere2 ) {
+
+							scaling.active = true;
+							scaling.object = sphere;
+							scaling.initialScale = sphere.scale.x;
+							scaling.initialDistance = indexTip.position.distanceTo( hand2.joints[ 'index-finger-tip' ].position );
+							return;
+
+						}
+
+					}
+
+				}
+			}
+				
+			function onPinchStartRight( event ) {
+
+				const controller = event.target;
+				const indexTip = controller.joints[ 'index-finger-tip' ];
+				const object = collideObject( indexTip );
+				if ( object ) {
+
+					grabbing = true;
+					indexTip.attach( object );
+					controller.userData.selected = object;
+					console.log( 'Selected', object );
+
+				}
+
+			}
+
+			function onPinchEndRight( event ) {
+
+				const controller = event.target;
+
+				if ( controller.userData.selected !== undefined ) {
+
+					const object = controller.userData.selected;
+					object.material.emissive.b = 0;
+					scene.attach( object );
+
+					controller.userData.selected = undefined;
+					grabbing = false;
+
+				}
+
+				scaling.active = false;
+
+			}
+			
+			var textureLoader = new THREE.TextureLoader();
+			
+			//	lights
+			const amb_light = new THREE.AmbientLight( 0x605050 );
+			scene.add( amb_light );
+			
+			//	stronger light indicating the center of the maze
+			
+			// light towards floor
+			// color, intensity, distance, angle, penumbra, decay
+			var spotLightCenter = new THREE.SpotLight( 0xffeedd, 20, 20, 2, 0.7, 0.9);
+			spotLightCenter.position.set( 0, 8, 0);
+			scene.add( spotLightCenter );
+			var lightHelperCenter = new THREE.SpotLightHelper(spotLightCenter);
+			//scene.add( lightHelperCenter );
+			
+			// light towards ceiling
+			spotLightCenter = new THREE.SpotLight( 0xff8010, 12, 30, 2, 0.7, 0.9);
+			spotLightCenter.position.set( 0, 1, 0);
+			spotLightCenter.target.position.set(0, 100, 0);
+			scene.add( spotLightCenter );
+			lightHelperCenter = new THREE.SpotLightHelper(spotLightCenter);
+			//scene.add( lightHelperCenter );
+
+			
+			var i, j;
+			for ( i = 0; i < 16; i++){
+			
+				for ( j = 0; j < 16 ; j++){
+					
+					if( ((i == j) || ((15-i)==j)) && ((((i<6) && (j<6)) || ((i<6) && (j>9))) || (((i>9) && (j<6)) || ((i>9) && (j>9))))){
+					
+						//var spotLight = new THREE.SpotLight( 0xff9940, 0.3, 200, 2, 1, 2);
+						// light towards floor
+						// color, intensity, distance, angle, penumbra, decay
+						var spotLight = new THREE.SpotLight( 0xff9940, 2, 15, 2.5, 0.7, 0.7);
+						spotLight.position.set( i * 10 - 75 , 8, j * 10 - 75);
+						spotLight.target.position.set(0,-100,0);
+						scene.add( spotLight );
+						var lightHelper = new THREE.SpotLightHelper(spotLight);
+						//scene.add( lightHelper );
+						
+						// light towards ceiling
+						spotLight = new THREE.SpotLight( 0xff7730, 1, 20, 2.5, 0.9, 0.7);
+						spotLight.position.set( i * 10 - 75 , 6, j * 10 - 75);
+						spotLight.target.position.set(i * 10 - 75, 100, j * 10 - 75);
+						scene.add( spotLight );
+						lightHelper = new THREE.SpotLightHelper(spotLight);
+						//scene.add( lightHelper );
+						
+					}
+					
+					else{
+						if((((i%3)==0) && ((i+j)%3 == 0)) && ((i<6)||(i>9)||(j<6)||(j>9))) {
+							//var spotLight = new THREE.SpotLight( 0xff9940, 0.3, 200, 2, 1, 2);
+							// light towards floor
+							// color, intensity, distance, angle, penumbra, decay
+							var spotLight = new THREE.SpotLight( 0xffaa60, 4, 25, 2.5, 0.7, 0.7);
+							spotLight.position.set( i * 10 - 75 , 10, j * 10 - 75);
+							spotLight.target.position.set(0,-100,0);
+							scene.add( spotLight );
+							lightHelper = new THREE.SpotLightHelper(spotLight);
+							//scene.add( lightHelper );
+							
+							// light towards ceiling
+							spotLight = new THREE.SpotLight( 0xff9940, 2, 20, 2.5, 0.9, 0.7);
+							spotLight.position.set( i * 10 - 75 , 6, j * 10 - 75);
+							spotLight.target.position.set(i * 10 - 75, 100, j * 10 - 75);
+							scene.add( spotLight );
+							lightHelper = new THREE.SpotLightHelper(spotLight);
+							//scene.add( lightHelper );
+							
+						}
+					}
+					
+				}
+				if((i == 5) || (i == 10)){
+					//var spotLight = new THREE.SpotLight( 0xff9940, 0.3, 200, 2, 1, 2);
+					// light towards floor
+					// color, intensity, distance, angle, penumbra, decay
+					var spotLight = new THREE.SpotLight( 0xffbb80, 2, 15, 2.5, 0.7, 0.7);
+					spotLight.position.set( i * 10 - 75 , 8, 7.5 * 10 - 75);
+					spotLight.target.position.set(0,-100,0);
+					scene.add( spotLight );
+					lightHelper = new THREE.SpotLightHelper(spotLight);
+					//scene.add( lightHelper );
+					
+					// light towards ceiling
+					spotLight = new THREE.SpotLight( 0xffaa60, 1.5, 20, 2.5, 0.9, 0.7);
+					spotLight.position.set( i * 10 - 75 , 6, 7.5 * 10 - 75);
+					spotLight.target.position.set(i * 10 - 75, 100, 7.5 * 10 - 75);
+					scene.add( spotLight );
+					lightHelper = new THREE.SpotLightHelper(spotLight);
+					//scene.add( lightHelper );
+					
+					//var spotLight = new THREE.SpotLight( 0xff9940, 0.3, 200, 2, 1, 2);
+					// color, intensity, distance, angle, penumbra, decay
+					var spotLight = new THREE.SpotLight( 0xffbb80, 2, 15, 2.5, 0.7, 0.7);
+					spotLight.position.set( 7.5 * 10 - 75 , 10, i * 10 - 75);
+					spotLight.target.position.set(7.5 * 10 - 75, -100, i * 10 - 75);
+					scene.add( spotLight );
+					lightHelper = new THREE.SpotLightHelper(spotLight);
+					//scene.add( lightHelper );
+					
+					// light towards ceiling
+					spotLight = new THREE.SpotLight( 0xffaa60, 1.5, 20, 2.5, 0.9, 0.7);
+					spotLight.position.set( 7.5 * 10 - 75 , 6, i * 10 - 75);
+					spotLight.target.position.set(7.5 * 10 - 75, 100, i * 10 - 75);
+					scene.add( spotLight );
+					lightHelper = new THREE.SpotLightHelper(spotLight);
+					//scene.add( lightHelper );
+					
+				}
+					
+			}
+			
+			
+			// instantiate a loader
+			const loader = new GLTFLoader().setPath( 'https://valentinainterdonato.github.io/models/' );
+			var color_map, bump_map, specular_map;
+			var mat_column, mat_ceiling, mat_wall, mat_pavement;
+			
+			//	load environment and textures
+			color_map = textureLoader.load('https://valentinainterdonato.github.io/models/column_color.png');
+			bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/column_bump.png');
+			specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/column_specular.png');
+			mat_column = new THREE.MeshPhongMaterial( { map: color_map, 
+														bumpMap: bump_map, bumpScale: 0.02,
+														specularMap: specular_map,
+														shininess: 10} );
+														
+			color_map = textureLoader.load('https://valentinainterdonato.github.io/models/ceiling_color.png');
+			bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/ceiling_bump.png');
+			specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/ceiling_specular.png');
+			mat_ceiling = new THREE.MeshPhongMaterial( { map: color_map, 
+														bumpMap: bump_map, bumpScale: 0.01,
+														specularMap: specular_map,
+														shininess: 1} );
+														
+			color_map = textureLoader.load('https://valentinainterdonato.github.io/models/stone_color.png');
+			bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/stone_bump.png');
+			specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/stone_specular.png');
+			mat_wall = new THREE.MeshPhongMaterial( { map: color_map, 
+														bumpMap: bump_map, bumpScale: 0.04,
+														specularMap: specular_map,
+														shininess: 0.5} );
+														
+			color_map = textureLoader.load('https://valentinainterdonato.github.io/models/pavement_color.png');
+			bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/pavement_bump.png');
+			specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/pavement_specular.png');
+			mat_pavement = new THREE.MeshPhongMaterial( { map: color_map, 
+														bumpMap: bump_map, bumpScale: 0.04,
+														specularMap: specular_map,
+														shininess: 1} );
+			
+			color_map.repeat.x = 12;
+			color_map.repeat.y = 12;
+			color_map.wrapS = THREE.RepeatWrapping;
+			color_map.wrapT = THREE.RepeatWrapping;
+			bump_map.repeat.x = 12;
+			bump_map.repeat.y = 12;
+			bump_map.wrapS = THREE.RepeatWrapping;
+			bump_map.wrapT = THREE.RepeatWrapping;
+			specular_map.repeat.x = 12;
+			specular_map.repeat.y = 12;
+			specular_map.wrapS = THREE.RepeatWrapping;
+			specular_map.wrapT = THREE.RepeatWrapping;
+			
+			
+			loader.load( 'maze_A.gltf', function ( gltf ) {
+			
+				gltf.scene.traverse( function ( child ) {
+
+							if ( child.isMesh ) {
+
+								child.receiveShadow = true;
+								child.castShadow = true;
+								var mesh_name = child.name.substring(0,3);
+								if(mesh_name=='cap' || mesh_name=='sha' || mesh_name == 'bas'){
+								
+									child.material = mat_column;
+								
+								}
+								else if (mesh_name == 'cei'){
+								
+									child.material = mat_ceiling;
+								
+								}
+								else if (mesh_name == 'wal'){
+								
+									child.material = mat_wall;
+								
+								}
+								else{
+								
+									child.material = mat_pavement;
+								
+								}
+
+							}
+
+						} );
+				scene.add( gltf.scene );
+			
+			} );
+
+
+			function animate() {
+			
+				if ( scaling.active ) {
+
+					const indexTip1Pos = hand1.joints[ 'index-finger-tip' ].position;
+					const indexTip2Pos = hand2.joints[ 'index-finger-tip' ].position;
+					const distance = indexTip1Pos.distanceTo( indexTip2Pos );
+					const newScale = scaling.initialScale + distance / scaling.initialDistance - 1;
+					scaling.object.scale.setScalar( newScale );
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+			
+			// is it better here after definition?
+			renderer.setAnimationLoop( animate );
+			
+		</script>
+	</body>
+</html>
