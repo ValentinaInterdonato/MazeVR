@@ -1,0 +1,2 @@
+# MazeVR
+Master thesis project
