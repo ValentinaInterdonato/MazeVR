@@ -292,54 +292,59 @@
 			
 			// instantiate a loader
 			const loader = new GLTFLoader().setPath( 'https://valentinainterdonato.github.io/models/' );
-			var color_map, bump_map, specular_map;
+			//var color_map, bump_map, specular_map;
+			var color_map;
 			var mat_column, mat_ceiling, mat_wall, mat_pavement;
 			
 			//	load environment and textures
 			color_map = textureLoader.load('https://valentinainterdonato.github.io/models/column_color.png');
-			bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/column_bump.png');
-			specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/column_specular.png');
-			mat_column = new THREE.MeshPhongMaterial( { map: color_map, 
-														bumpMap: bump_map, bumpScale: 0.02,
-														specularMap: specular_map,
-														shininess: 10} );
+			//bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/column_bump.png');
+			//specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/column_specular.png');
+			//mat_column = new THREE.MeshPhongMaterial( { map: color_map, 
+														//bumpMap: bump_map, bumpScale: 0.02,
+														//specularMap: specular_map,
+														//shininess: 10} );
+			mat_column = new THREE.MeshPhongMaterial( { map: color_map});
 														
 			color_map = textureLoader.load('https://valentinainterdonato.github.io/models/ceiling_color.png');
-			bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/ceiling_bump.png');
-			specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/ceiling_specular.png');
-			mat_ceiling = new THREE.MeshPhongMaterial( { map: color_map, 
-														bumpMap: bump_map, bumpScale: 0.01,
-														specularMap: specular_map,
-														shininess: 1} );
+			//bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/ceiling_bump.png');
+			//specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/ceiling_specular.png');
+			//mat_ceiling = new THREE.MeshPhongMaterial( { map: color_map, 
+														//bumpMap: bump_map, bumpScale: 0.01,
+														//specularMap: specular_map,
+														//shininess: 1} );
+			mat_ceiling = new THREE.MeshPhongMaterial( { map: color_map});
 														
 			color_map = textureLoader.load('https://valentinainterdonato.github.io/models/stone_color.png');
-			bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/stone_bump.png');
-			specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/stone_specular.png');
-			mat_wall = new THREE.MeshPhongMaterial( { map: color_map, 
-														bumpMap: bump_map, bumpScale: 0.04,
-														specularMap: specular_map,
-														shininess: 0.5} );
+			//bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/stone_bump.png');
+			//specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/stone_specular.png');
+			//mat_wall = new THREE.MeshPhongMaterial( { map: color_map, 
+														//bumpMap: bump_map, bumpScale: 0.04,
+														//specularMap: specular_map,
+														//shininess: 0.5} );
+			mat_wall = new THREE.MeshPhongMaterial( { map: color_map});
 														
 			color_map = textureLoader.load('https://valentinainterdonato.github.io/models/pavement_color.png');
-			bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/pavement_bump.png');
-			specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/pavement_specular.png');
-			mat_pavement = new THREE.MeshPhongMaterial( { map: color_map, 
-														bumpMap: bump_map, bumpScale: 0.04,
-														specularMap: specular_map,
-														shininess: 1} );
+			//bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/pavement_bump.png');
+			//specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/pavement_specular.png');
+			//mat_pavement = new THREE.MeshPhongMaterial( { map: color_map, 
+														//bumpMap: bump_map, bumpScale: 0.04,
+														//specularMap: specular_map,
+														//shininess: 1} );
+			mat_pavement = new THREE.MeshPhongMaterial( { map: color_map});
 			
 			color_map.repeat.x = 12;
 			color_map.repeat.y = 12;
 			color_map.wrapS = THREE.RepeatWrapping;
 			color_map.wrapT = THREE.RepeatWrapping;
-			bump_map.repeat.x = 12;
-			bump_map.repeat.y = 12;
-			bump_map.wrapS = THREE.RepeatWrapping;
-			bump_map.wrapT = THREE.RepeatWrapping;
-			specular_map.repeat.x = 12;
-			specular_map.repeat.y = 12;
-			specular_map.wrapS = THREE.RepeatWrapping;
-			specular_map.wrapT = THREE.RepeatWrapping;
+			//bump_map.repeat.x = 12;
+			//bump_map.repeat.y = 12;
+			//bump_map.wrapS = THREE.RepeatWrapping;
+			//bump_map.wrapT = THREE.RepeatWrapping;
+			//specular_map.repeat.x = 12;
+			//specular_map.repeat.y = 12;
+			//specular_map.wrapS = THREE.RepeatWrapping;
+			//specular_map.wrapT = THREE.RepeatWrapping;
 			
 			
 			loader.load( 'maze_A.gltf', function ( gltf ) {
