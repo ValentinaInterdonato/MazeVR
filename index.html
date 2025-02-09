@@ -38,14 +38,60 @@
 
 
 			scene = new THREE.Scene();
-			camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			//camera.position.y = 120;
 			//camera.position.z = 0;
 			//camera.lookAt(70, 70, 0);
-			camera.position.x = 0;
-			camera.position.y = 2;
-			camera.position.z = 0;
+			//camera.position.x = 0;
+			camera.position.y = 4;
+			//camera.position.z = 0;
 			
+			var textureLoader = new THREE.TextureLoader();
+			
+			//	compass pointing to the center of the maze
+			var compass_geo = new THREE.PlaneGeometry(1,1);
+			var compass_map = textureLoader.load( 'https://valentinainterdonato.github.io/models/arrow_yellow.png' );
+			var compass_mat = new THREE.MeshLambertMaterial({map: compass_map, transparent: true, 
+														emissive: new THREE.Color("rgb(255, 255, 0)")});
+			var compass = new THREE.Mesh(compass_geo, compass_mat);
+			compass.scale.set(0.1, 0.1, 0.1);
+			compass.rotation.y = camera.rotation.y;
+			compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
+			scene.add(compass);
+			
+			//put the camera in one of the corners
+			var corner = Math.random();
+			let pelvis_pos_x, pelvis_pos_z;
+			var pelvis_rot_y = 0;
+				
+			if(corner < 0.25){
+				pelvis_pos_x = -75;
+				pelvis_pos_z = -75;
+				camera.position.x = -75;
+				camera.position.z = -70;
+				compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
+			}	
+			else if(corner < 0.5){
+				pelvis_pos_x = 75;
+				pelvis_pos_z = -75;
+				camera.position.x = 75;
+				camera.position.z = -70;
+				compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
+			}
+			else if(corner < 0.75){
+				pelvis_pos_x = -75;
+				pelvis_pos_z = 70;
+				camera.position.x = -75;
+				camera.position.z = 75;
+				compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
+			}
+			else{
+				pelvis_pos_x = 75;
+				pelvis_pos_z = 70;
+				camera.position.x = 75;
+				camera.position.z = 75;
+				compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
+			}
 			
 			/////////////////
 			marker = new THREE.Mesh(
@@ -55,8 +101,8 @@
 			scene.add( marker );
 			
 			floor = new THREE.Mesh(
-					new THREE.PlaneGeometry( 100, 100).rotateX( - Math.PI / 2 ),
-					new THREE.MeshBasicMaterial( { color: 0xbcbcbc, transparent: true, opacity: 0.25 } )
+					new THREE.PlaneGeometry( 180, 180).rotateX( - Math.PI / 2 ),
+					new THREE.MeshBasicMaterial( { color: 0xbcbcbc, transparent: true, opacity: 0 } )
 				);
 			scene.add( floor );
 
@@ -192,14 +238,10 @@
 			
 			////////////////////////
 			
-			
-			var textureLoader = new THREE.TextureLoader();
-			
 			//	lights
 			const light1 = new THREE.DirectionalLight( 0xffffff, 3 );
 			light1.position.set( 200, 200, 0 );
-			scene.add( light1 );
-			
+			scene.add( light1 );			
 			
 			// instantiate a loader
 			const loader = new GLTFLoader().setPath( 'https://valentinainterdonato.github.io/models/' );
@@ -208,6 +250,13 @@
 			const threeTone = textureLoader.load( 'https://valentinainterdonato.github.io/models/threeTone.jpg' );
 			threeTone.minFilter = THREE.NearestFilter;
 			threeTone.magFilter = THREE.NearestFilter;
+			
+			// prize at the center
+			const trophyGeometry = new THREE.BoxGeometry( 1, 2, 1);
+			const mat_trophy =  new THREE.MeshToonMaterial( { color: 0xffff33, gradientMap:threeTone } );
+			var trophy = new THREE.Mesh(trophyGeometry, mat_trophy);
+			trophy.position.set(0, 1, 0);
+			scene.add(trophy);
 			
 			//	set environment materials
 			mat_column = new THREE.MeshToonMaterial( { color: 0xff0000, gradientMap:threeTone } );
@@ -250,9 +299,121 @@
 				scene.add( gltf.scene );
 			
 			} );
+			
+			var walking = false;
+			var direction;
+			var distance = 0;
+			var alpha = 0;
+			
+			//	when pressing any arrow the character walks
+			document.addEventListener("keydown", function(e){
+				switch(e.keyCode){
+					case 37: // Press ←
+						walking = true;
+						direction = "left";
+						break;
+						
+					case 39: // Press →
+						walking = true;
+						direction = "right";
+						break;
+						
+					case 38: // Press ↑
+						walking = true;
+						direction = "forward";
+						break;
+				
+				}
+		
+			});
+			
+			// when releasing any arrow the character idles
+			window.addEventListener("keyup", function(e){
+		
+				switch(e.keyCode){
+
+					case 37: // Press ← 
+					case 39: // Press → 
+					case 38: // Press ↑
+						walking = false;
+						break;
+			
+					}
+		
+			});
 
 
 			function animate() {
+			
+				if(pelvis_rot_y > 2*Math.PI){
+					pelvis_rot_y = pelvis_rot_y - 2*Math.PI;
+				}
+				
+				if(pelvis_rot_y < 0){
+					pelvis_rot_y = pelvis_rot_y + 2*Math.PI;
+				}
+			
+				if (walking){
+					//	update camera position and compass orientation
+					//	according to the key that was pressed
+					switch(direction){
+					
+						case "left":
+							pelvis_rot_y += 0.1;
+							camera.rotation.y = pelvis_rot_y - Math.PI;
+							camera.position.x = pelvis_pos_x + 7 * Math.sin(camera.rotation.y);
+							camera.position.z = pelvis_pos_z + 7 * Math.cos(camera.rotation.y);
+							compass.position.x = pelvis_pos_x + 6 * Math.sin(camera.rotation.y);
+							compass.position.z = pelvis_pos_z + 6 * Math.cos(camera.rotation.y);
+							compass.rotation.y = camera.rotation.y;
+							distance = Math.sqrt(Math.pow(pelvis_pos_x,2) + Math.pow(pelvis_pos_z,2));
+							alpha = Math.acos(pelvis_pos_z/distance);
+							compass.rotation.z = alpha - camera.rotation.y;
+							if(pelvis_pos_x < 0){	
+								alpha = Math.acos(-pelvis_pos_z/distance);
+								compass.rotation.z = alpha - camera.rotation.y - Math.PI;
+							}
+							break;
+						
+						case "right":
+							pelvis_rot_y -= 0.1;
+							camera.rotation.y = pelvis_rot_y - Math.PI;
+							camera.position.x = pelvis_pos_x + 7 * Math.sin(camera.rotation.y);
+							camera.position.z = pelvis_pos_z + 7 * Math.cos(camera.rotation.y);
+							compass.position.x = pelvis_pos_x + 6 * Math.sin(camera.rotation.y);
+							compass.position.z = pelvis_pos_z + 6 * Math.cos(camera.rotation.y);
+							compass.rotation.y = camera.rotation.y;
+							distance = Math.sqrt(Math.pow(pelvis_pos_x,2) + Math.pow(pelvis_pos_z,2));
+							alpha = Math.acos(pelvis_pos_z/distance);
+							compass.rotation.z = alpha - camera.rotation.y;
+							if(pelvis_pos_x < 0){	
+								alpha = Math.acos(-pelvis_pos_z/distance);
+								compass.rotation.z = alpha - camera.rotation.y - Math.PI;		
+							}
+							break;
+							
+						case "forward":
+							pelvis_pos_x += 0.08 * Math.cos(pelvis_rot_y - Math.PI/2);
+							pelvis_pos_z -= 0.08 * Math.sin(pelvis_rot_y - Math.PI/2);
+							camera.rotation.y = pelvis_rot_y - Math.PI;
+							camera.position.x = pelvis_pos_x + 7 * Math.sin(camera.rotation.y);
+							camera.position.z = pelvis_pos_z + 7 * Math.cos(camera.rotation.y);
+							compass.position.x = pelvis_pos_x + 6 * Math.sin(camera.rotation.y);
+							compass.position.z = pelvis_pos_z + 6 * Math.cos(camera.rotation.y);
+							compass.rotation.y = camera.rotation.y;
+							distance = Math.sqrt(Math.pow(pelvis_pos_x,2) + Math.pow(pelvis_pos_z,2));
+							alpha = Math.acos(pelvis_pos_z/distance);
+							compass.rotation.z = alpha - camera.rotation.y;
+							if(pelvis_pos_x < 0){								
+								alpha = Math.acos(-pelvis_pos_z/distance);
+								compass.rotation.z = alpha - camera.rotation.y - Math.PI;		
+							}
+							break;
+
+					}
+					
+				
+				}
 			
 			
 				//////////////////
