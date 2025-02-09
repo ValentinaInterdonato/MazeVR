@@ -176,118 +176,9 @@
 			var textureLoader = new THREE.TextureLoader();
 			
 			//	lights
-			const amb_light = new THREE.AmbientLight( 0x605050 );
-			scene.add( amb_light );
-			
-			//	stronger light indicating the center of the maze
-			
-			// light towards floor
-			// color, intensity, distance, angle, penumbra, decay
-			var spotLightCenter = new THREE.SpotLight( 0xffeedd, 20, 20, 2, 0.7, 0.9);
-			spotLightCenter.position.set( 0, 8, 0);
-			scene.add( spotLightCenter );
-			var lightHelperCenter = new THREE.SpotLightHelper(spotLightCenter);
-			//scene.add( lightHelperCenter );
-			
-			// light towards ceiling
-			spotLightCenter = new THREE.SpotLight( 0xff8010, 12, 30, 2, 0.7, 0.9);
-			spotLightCenter.position.set( 0, 1, 0);
-			spotLightCenter.target.position.set(0, 100, 0);
-			scene.add( spotLightCenter );
-			lightHelperCenter = new THREE.SpotLightHelper(spotLightCenter);
-			//scene.add( lightHelperCenter );
-
-			
-			var i, j;
-			for ( i = 0; i < 16; i++){
-			
-				for ( j = 0; j < 16 ; j++){
-					
-					if( ((i == j) || ((15-i)==j)) && ((((i<6) && (j<6)) || ((i<6) && (j>9))) || (((i>9) && (j<6)) || ((i>9) && (j>9))))){
-					
-						//var spotLight = new THREE.SpotLight( 0xff9940, 0.3, 200, 2, 1, 2);
-						// light towards floor
-						// color, intensity, distance, angle, penumbra, decay
-						var spotLight = new THREE.SpotLight( 0xff9940, 2, 15, 2.5, 0.7, 0.7);
-						spotLight.position.set( i * 10 - 75 , 8, j * 10 - 75);
-						spotLight.target.position.set(0,-100,0);
-						scene.add( spotLight );
-						var lightHelper = new THREE.SpotLightHelper(spotLight);
-						//scene.add( lightHelper );
-						
-						// light towards ceiling
-						spotLight = new THREE.SpotLight( 0xff7730, 1, 20, 2.5, 0.9, 0.7);
-						spotLight.position.set( i * 10 - 75 , 6, j * 10 - 75);
-						spotLight.target.position.set(i * 10 - 75, 100, j * 10 - 75);
-						scene.add( spotLight );
-						lightHelper = new THREE.SpotLightHelper(spotLight);
-						//scene.add( lightHelper );
-						
-					}
-					
-					else{
-						if((((i%3)==0) && ((i+j)%3 == 0)) && ((i<6)||(i>9)||(j<6)||(j>9))) {
-							//var spotLight = new THREE.SpotLight( 0xff9940, 0.3, 200, 2, 1, 2);
-							// light towards floor
-							// color, intensity, distance, angle, penumbra, decay
-							var spotLight = new THREE.SpotLight( 0xffaa60, 4, 25, 2.5, 0.7, 0.7);
-							spotLight.position.set( i * 10 - 75 , 10, j * 10 - 75);
-							spotLight.target.position.set(0,-100,0);
-							scene.add( spotLight );
-							lightHelper = new THREE.SpotLightHelper(spotLight);
-							//scene.add( lightHelper );
-							
-							// light towards ceiling
-							spotLight = new THREE.SpotLight( 0xff9940, 2, 20, 2.5, 0.9, 0.7);
-							spotLight.position.set( i * 10 - 75 , 6, j * 10 - 75);
-							spotLight.target.position.set(i * 10 - 75, 100, j * 10 - 75);
-							scene.add( spotLight );
-							lightHelper = new THREE.SpotLightHelper(spotLight);
-							//scene.add( lightHelper );
-							
-						}
-					}
-					
-				}
-				if((i == 5) || (i == 10)){
-					//var spotLight = new THREE.SpotLight( 0xff9940, 0.3, 200, 2, 1, 2);
-					// light towards floor
-					// color, intensity, distance, angle, penumbra, decay
-					var spotLight = new THREE.SpotLight( 0xffbb80, 2, 15, 2.5, 0.7, 0.7);
-					spotLight.position.set( i * 10 - 75 , 8, 7.5 * 10 - 75);
-					spotLight.target.position.set(0,-100,0);
-					scene.add( spotLight );
-					lightHelper = new THREE.SpotLightHelper(spotLight);
-					//scene.add( lightHelper );
-					
-					// light towards ceiling
-					spotLight = new THREE.SpotLight( 0xffaa60, 1.5, 20, 2.5, 0.9, 0.7);
-					spotLight.position.set( i * 10 - 75 , 6, 7.5 * 10 - 75);
-					spotLight.target.position.set(i * 10 - 75, 100, 7.5 * 10 - 75);
-					scene.add( spotLight );
-					lightHelper = new THREE.SpotLightHelper(spotLight);
-					//scene.add( lightHelper );
-					
-					//var spotLight = new THREE.SpotLight( 0xff9940, 0.3, 200, 2, 1, 2);
-					// color, intensity, distance, angle, penumbra, decay
-					var spotLight = new THREE.SpotLight( 0xffbb80, 2, 15, 2.5, 0.7, 0.7);
-					spotLight.position.set( 7.5 * 10 - 75 , 10, i * 10 - 75);
-					spotLight.target.position.set(7.5 * 10 - 75, -100, i * 10 - 75);
-					scene.add( spotLight );
-					lightHelper = new THREE.SpotLightHelper(spotLight);
-					//scene.add( lightHelper );
-					
-					// light towards ceiling
-					spotLight = new THREE.SpotLight( 0xffaa60, 1.5, 20, 2.5, 0.9, 0.7);
-					spotLight.position.set( 7.5 * 10 - 75 , 6, i * 10 - 75);
-					spotLight.target.position.set(7.5 * 10 - 75, 100, i * 10 - 75);
-					scene.add( spotLight );
-					lightHelper = new THREE.SpotLightHelper(spotLight);
-					//scene.add( lightHelper );
-					
-				}
-					
-			}
+			const light1 = new THREE.DirectionalLight( 0xffffff, 3 );
+			light1.position.set( 200, 200, 0 );
+			scene.add( light1 );
 			
 			
 			// instantiate a loader
@@ -295,66 +186,23 @@
 			//var color_map, bump_map, specular_map;
 			var color_map;
 			var mat_column, mat_ceiling, mat_wall, mat_pavement;
+			const threeTone = textureLoader.load( 'https://valentinainterdonato.github.io/models/threeTone.jpg' );
+			threeTone.minFilter = THREE.NearestFilter;
+			threeTone.magFilter = THREE.NearestFilter;
 			
-			//	load environment and textures
-			color_map = textureLoader.load('https://valentinainterdonato.github.io/models/column_color_250.jpg');
-			//bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/column_bump.png');
-			//specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/column_specular.png');
-			//mat_column = new THREE.MeshPhongMaterial( { map: color_map, 
-														//bumpMap: bump_map, bumpScale: 0.02,
-														//specularMap: specular_map,
-														//shininess: 10} );
-			mat_column = new THREE.MeshPhongMaterial( { map: color_map});
-														
-			color_map = textureLoader.load('https://valentinainterdonato.github.io/models/ceiling_color_250.jpg');
-			//bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/ceiling_bump.png');
-			//specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/ceiling_specular.png');
-			//mat_ceiling = new THREE.MeshPhongMaterial( { map: color_map, 
-														//bumpMap: bump_map, bumpScale: 0.01,
-														//specularMap: specular_map,
-														//shininess: 1} );
-			mat_ceiling = new THREE.MeshPhongMaterial( { map: color_map});
-														
-			color_map = textureLoader.load('https://valentinainterdonato.github.io/models/stone_color_250.jpg');
-			//bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/stone_bump.png');
-			//specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/stone_specular.png');
-			//mat_wall = new THREE.MeshPhongMaterial( { map: color_map, 
-														//bumpMap: bump_map, bumpScale: 0.04,
-														//specularMap: specular_map,
-														//shininess: 0.5} );
-			mat_wall = new THREE.MeshPhongMaterial( { map: color_map});
-														
-			color_map = textureLoader.load('https://valentinainterdonato.github.io/models/pavement_color_250.jpg');
-			//bump_map = textureLoader.load('https://valentinainterdonato.github.io/models/pavement_bump.png');
-			//specular_map = textureLoader.load('https://valentinainterdonato.github.io/models/pavement_specular.png');
-			//mat_pavement = new THREE.MeshPhongMaterial( { map: color_map, 
-														//bumpMap: bump_map, bumpScale: 0.04,
-														//specularMap: specular_map,
-														//shininess: 1} );
-			mat_pavement = new THREE.MeshPhongMaterial( { map: color_map});
+			//	set environment materials
+			mat_column = new THREE.MeshToonMaterial( { color: 0xff0000, gradientMap:threeTone } );
+			mat_ceiling = new THREE.MeshToonMaterial( { color: 0x049EF4, gradientMap:threeTone } );
+			mat_wall = new THREE.MeshToonMaterial( { color: 0x00ff00, gradientMap:threeTone } );
+			mat_pavement = new THREE.MeshToonMaterial( { color: 0x0000ff, gradientMap:threeTone } );
 			
-			color_map.repeat.x = 12;
-			color_map.repeat.y = 12;
-			color_map.wrapS = THREE.RepeatWrapping;
-			color_map.wrapT = THREE.RepeatWrapping;
-			//bump_map.repeat.x = 12;
-			//bump_map.repeat.y = 12;
-			//bump_map.wrapS = THREE.RepeatWrapping;
-			//bump_map.wrapT = THREE.RepeatWrapping;
-			//specular_map.repeat.x = 12;
-			//specular_map.repeat.y = 12;
-			//specular_map.wrapS = THREE.RepeatWrapping;
-			//specular_map.wrapT = THREE.RepeatWrapping;
-			
-			
+			//load geometries
 			loader.load( 'maze_A.gltf', function ( gltf ) {
 			
 				gltf.scene.traverse( function ( child ) {
 
 							if ( child.isMesh ) {
 
-								child.receiveShadow = true;
-								child.castShadow = true;
 								var mesh_name = child.name.substring(0,3);
 								if(mesh_name=='cap' || mesh_name=='sha' || mesh_name == 'bas'){
 								
