@@ -19,29 +19,19 @@
 		<script type="module" >
 			import * as THREE from 'three';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			
-			
-			/////////////
-			import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
 			let camera, scene, raycaster, renderer;
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
-
 			let room, marker, floor, baseReferenceSpace;
-
 			let INTERSECTION;
 			const tempMatrix = new THREE.Matrix4();
-
-
 			var walking = false;
-			var direction;
+			let direction;
 			var distance = 0;
 			var alpha = 0;
-			/////////////
-
 
 			scene = new THREE.Scene();
 			camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -51,6 +41,17 @@
 			//camera.position.x = 0;
 			camera.position.y = 4;
 			//camera.position.z = 0;
+			
+			raycaster = new THREE.Raycaster();
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			// is it ok to set animate here b4 definition?
+			renderer.setAnimationLoop( animate );
+			
+			renderer.xr.addEventListener( 'sessionstart', () => baseReferenceSpace = renderer.xr.getReferenceSpace() );
+			renderer.xr.enabled = true;
+			document.body.appendChild( renderer.domElement );
+			document.body.appendChild( VRButton.createButton( renderer ) );
 			
 			var textureLoader = new THREE.TextureLoader();
 			
@@ -90,6 +91,11 @@
 				camera.position.z = 75;
 			}
 			
+			const offsetPosition = { x: camera.position.x, y: camera.position.y, z: camera.position.z, w: 1 };
+			const offsetRotation = new THREE.Quaternion();
+			const transform = new XRRigidTransform( offsetPosition, offsetRotation );
+			renderer.xr.setReferenceSpace( transform );
+			
 			var compass = new THREE.Mesh(compass_geo, compass_mat);
 			compass.scale.set(0.1, 0.1, 0.1);
 			compass.rotation.y = camera.rotation.y;
@@ -103,7 +109,6 @@
 			}
 			scene.add(compass);
 			
-			/////////////////
 			marker = new THREE.Mesh(
 					new THREE.CircleGeometry( 0.25, 32 ).rotateX( - Math.PI / 2 ),
 					new THREE.MeshBasicMaterial( { color: 0xbcbcbc } )
@@ -116,34 +121,12 @@
 				);
 			scene.add( floor );
 
-			raycaster = new THREE.Raycaster();
-			/////////////////
-
-
-			renderer = new THREE.WebGLRenderer();
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			// is it ok to set animate here b4 definition?
-			renderer.setAnimationLoop( animate );
-			//document.body.appendChild( renderer.domElement );
-			
-			
-			//////////////
-			renderer.xr.addEventListener( 'sessionstart', () => baseReferenceSpace = renderer.xr.getReferenceSpace() );
-			renderer.xr.enabled = true;
-			document.body.appendChild( renderer.domElement );
-			document.body.appendChild( VRButton.createButton( renderer ) );
-			////////////
-			
-			
-			/////////////
 			// controllers
-
 			function onSelectStart() {
 
 				this.userData.isSelecting = true;
 
 			}
-
 			function onSelectEnd() {
 
 				this.userData.isSelecting = false;
@@ -230,7 +213,6 @@
 
 			}
 			
-			////////////////////////
 			
 			//	lights
 			const light1 = new THREE.DirectionalLight( 0xffffff, 3 );
@@ -294,7 +276,7 @@
 			
 			} );
 			
-			//	when pressing any arrow the character walks
+			//	when pressing any arrow the camera moves
 			document.addEventListener("keydown", function(e){
 				switch(e.keyCode){
 					case 37: // Press ←
@@ -316,7 +298,7 @@
 		
 			});
 			
-			// when releasing any arrow the character idles
+			// when releasing any arrow the camera stops
 			window.addEventListener("keyup", function(e){
 		
 				switch(e.keyCode){
@@ -341,7 +323,7 @@
 				if(pelvis_rot_y < 0){
 					pelvis_rot_y = pelvis_rot_y + 2*Math.PI;
 				}
-			
+				
 				if (walking){
 					//	update camera position and compass orientation
 					//	according to the key that was pressed
@@ -403,8 +385,6 @@
 					
 				
 				}
-			
-				//////////////////
 				
 				INTERSECTION = undefined;
 
@@ -440,20 +420,13 @@
 
 				}
 
-
 				if ( INTERSECTION ) marker.position.copy( INTERSECTION );
-
 				marker.visible = INTERSECTION !== undefined;
-				
-				////////////////
-
 
 				renderer.render( scene, camera );
 
 			}
 			
-			// is it better here after definition?
-			//renderer.setAnimationLoop( animate );
 			
 		</script>
 	</body>
