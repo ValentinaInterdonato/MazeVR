@@ -91,11 +91,6 @@
 				camera.position.z = 75;
 			}
 			
-			const offsetPosition = { x: camera.position.x, y: camera.position.y, z: camera.position.z, w: 1 };
-			const offsetRotation = new THREE.Quaternion();
-			const transform = new XRRigidTransform( offsetPosition, offsetRotation );
-			renderer.xr.setReferenceSpace( transform );
-			
 			var compass = new THREE.Mesh(compass_geo, compass_mat);
 			compass.scale.set(0.1, 0.1, 0.1);
 			compass.rotation.y = camera.rotation.y;
@@ -385,6 +380,11 @@
 					
 				
 				}
+				
+				const offsetPosition = { x: camera.position.x, y: camera.position.y, z: camera.position.z, w: 1 };
+				const offsetRotation = new THREE.Quaternion();
+				const transform = new XRRigidTransform( offsetPosition, offsetRotation );
+				renderer.xr.setReferenceSpace( transform );
 				
 				INTERSECTION = undefined;
 
