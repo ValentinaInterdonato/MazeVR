@@ -122,6 +122,7 @@
 				this.userData.isSelecting = true;
 
 			}
+			
 			function onSelectEnd() {
 
 				this.userData.isSelecting = false;
@@ -379,6 +380,14 @@
 					}
 					
 				
+				}
+				
+				if (baseReferenceSpace != undefined){
+					const offsetPosition = { x: camera.position.x, y: camera.position.y, z: camera.position.z, w: 1 };
+					const offsetRotation = new THREE.Quaternion();
+					const transform = new XRRigidTransform( offsetPosition, offsetRotation );
+					const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace( transform );
+					renderer.xr.setReferenceSpace( teleportSpaceOffset );
 				}
 				
 				INTERSECTION = undefined;
