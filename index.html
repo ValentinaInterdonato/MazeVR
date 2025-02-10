@@ -381,11 +381,6 @@
 				
 				}
 				
-				const offsetPosition = { x: camera.position.x, y: camera.position.y, z: camera.position.z, w: 1 };
-				const offsetRotation = new THREE.Quaternion();
-				const transform = new XRRigidTransform( offsetPosition, offsetRotation );
-				renderer.xr.setReferenceSpace( transform );
-				
 				INTERSECTION = undefined;
 
 				if ( controller1.userData.isSelecting === true ) {
