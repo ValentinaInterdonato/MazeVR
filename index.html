@@ -86,7 +86,7 @@
 			
 			function onSessionStart(){
 				baseReferenceSpace = renderer.xr.getReferenceSpace();
-				const offsetPosition = { x: camera.position.x, y: camera.position.y, z: camera.position.z, w: 1 };
+				const offsetPosition = { x: -camera.position.x, y: -camera.position.y, z: -camera.position.z, w: 1 };
 				const offsetRotation = new THREE.Quaternion();
 				const transform = new XRRigidTransform( offsetPosition, offsetRotation );
 				const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace( transform );
