@@ -48,19 +48,6 @@
 			// is it ok to set animate here b4 definition?
 			renderer.setAnimationLoop( animate );
 			
-			renderer.xr.addEventListener( 'sessionstart', () => baseReferenceSpace = renderer.xr.getReferenceSpace() );
-			renderer.xr.enabled = true;
-			document.body.appendChild( renderer.domElement );
-			document.body.appendChild( VRButton.createButton( renderer ) );
-			
-			var textureLoader = new THREE.TextureLoader();
-			
-			//	compass pointing to the center of the maze
-			var compass_geo = new THREE.PlaneGeometry(1,1);
-			var compass_map = textureLoader.load( 'https://valentinainterdonato.github.io/models/arrow_yellow.png' );
-			var compass_mat = new THREE.MeshLambertMaterial({map: compass_map, transparent: true, 
-														emissive: new THREE.Color("rgb(255, 255, 0)")});
-			
 			//put the camera in one of the corners
 			var corner = Math.random();
 			let pelvis_pos_x, pelvis_pos_z;
@@ -90,6 +77,29 @@
 				camera.position.x = 75;
 				camera.position.z = 75;
 			}
+			
+			//renderer.xr.addEventListener( 'sessionstart', () => baseReferenceSpace = renderer.xr.getReferenceSpace() );
+			renderer.xr.addEventListener( 'sessionstart', onSessionStart);
+			renderer.xr.enabled = true;
+			document.body.appendChild( renderer.domElement );
+			document.body.appendChild( VRButton.createButton( renderer ) );
+			
+			function onSessionStart(){
+				baseReferenceSpace = renderer.xr.getReferenceSpace();
+				const offsetPosition = { x: camera.position.x, y: camera.position.y, z: camera.position.z, w: 1 };
+				const offsetRotation = new THREE.Quaternion();
+				const transform = new XRRigidTransform( offsetPosition, offsetRotation );
+				const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace( transform );
+				renderer.xr.setReferenceSpace( teleportSpaceOffset );
+			}
+			
+			var textureLoader = new THREE.TextureLoader();
+			
+			//	compass pointing to the center of the maze
+			var compass_geo = new THREE.PlaneGeometry(1,1);
+			var compass_map = textureLoader.load( 'https://valentinainterdonato.github.io/models/arrow_yellow.png' );
+			var compass_mat = new THREE.MeshLambertMaterial({map: compass_map, transparent: true, 
+														emissive: new THREE.Color("rgb(255, 255, 0)")});
 			
 			var compass = new THREE.Mesh(compass_geo, compass_mat);
 			compass.scale.set(0.1, 0.1, 0.1);
@@ -309,13 +319,14 @@
 		
 			});
 			
-			if (baseReferenceSpace != undefined){
-				const offsetPosition = { x: camera.position.x, y: camera.position.y, z: camera.position.z, w: 1 };
-				const offsetRotation = new THREE.Quaternion();
-				const transform = new XRRigidTransform( offsetPosition, offsetRotation );
-				const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace( transform );
-				renderer.xr.setReferenceSpace( teleportSpaceOffset );
-			}
+			
+			//if (baseReferenceSpace != undefined){
+			//	const offsetPosition = { x: camera.position.x, y: camera.position.y, z: camera.position.z, w: 1 };
+			//	const offsetRotation = new THREE.Quaternion();
+			//	const transform = new XRRigidTransform( offsetPosition, offsetRotation );
+			//	const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace( transform );
+			//	renderer.xr.setReferenceSpace( teleportSpaceOffset );
+			//}
 
 
 			function animate() {
