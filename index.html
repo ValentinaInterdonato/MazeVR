@@ -33,7 +33,13 @@
 			let room, marker, floor, baseReferenceSpace;
 
 			let INTERSECTION;
-			const tempMatrix = new THREE.Matrix4();				
+			const tempMatrix = new THREE.Matrix4();
+
+
+			var walking = false;
+			var direction;
+			var distance = 0;
+			var alpha = 0;
 			/////////////
 
 
@@ -53,45 +59,49 @@
 			var compass_map = textureLoader.load( 'https://valentinainterdonato.github.io/models/arrow_yellow.png' );
 			var compass_mat = new THREE.MeshLambertMaterial({map: compass_map, transparent: true, 
 														emissive: new THREE.Color("rgb(255, 255, 0)")});
-			var compass = new THREE.Mesh(compass_geo, compass_mat);
-			compass.scale.set(0.1, 0.1, 0.1);
-			compass.rotation.y = camera.rotation.y;
-			compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
-			scene.add(compass);
 			
 			//put the camera in one of the corners
 			var corner = Math.random();
 			let pelvis_pos_x, pelvis_pos_z;
-			var pelvis_rot_y = 0;
+			var pelvis_rot_y = -Math.PI;
 				
 			if(corner < 0.25){
 				pelvis_pos_x = -75;
 				pelvis_pos_z = -75;
 				camera.position.x = -75;
 				camera.position.z = -70;
-				compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
 			}	
 			else if(corner < 0.5){
 				pelvis_pos_x = 75;
 				pelvis_pos_z = -75;
 				camera.position.x = 75;
 				camera.position.z = -70;
-				compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
 			}
 			else if(corner < 0.75){
 				pelvis_pos_x = -75;
 				pelvis_pos_z = 70;
 				camera.position.x = -75;
 				camera.position.z = 75;
-				compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
 			}
 			else{
 				pelvis_pos_x = 75;
 				pelvis_pos_z = 70;
 				camera.position.x = 75;
 				camera.position.z = 75;
-				compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
 			}
+			
+			var compass = new THREE.Mesh(compass_geo, compass_mat);
+			compass.scale.set(0.1, 0.1, 0.1);
+			compass.rotation.y = camera.rotation.y;
+			compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
+			distance = Math.sqrt(Math.pow(pelvis_pos_x,2) + Math.pow(pelvis_pos_z,2));
+			alpha = Math.acos(pelvis_pos_z/distance);
+			compass.rotation.z = alpha - camera.rotation.y;
+			if(pelvis_pos_x < 0){	
+				alpha = Math.acos(-pelvis_pos_z/distance);
+				compass.rotation.z = alpha - camera.rotation.y - Math.PI;
+			}
+			scene.add(compass);
 			
 			/////////////////
 			marker = new THREE.Mesh(
@@ -180,22 +190,6 @@
 
 			} );
 			scene.add( controller2 );
-
-
-			// The XRControllerModelFactory will automatically fetch controller models
-			// that match what the user is holding as closely as possible. The models
-			// should be attached to the object returned from getControllerGrip in
-			// order to match the orientation of the held device.
-
-			const controllerModelFactory = new XRControllerModelFactory();
-
-			controllerGrip1 = renderer.xr.getControllerGrip( 0 );
-			controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
-			scene.add( controllerGrip1 );
-			
-			controllerGrip2 = renderer.xr.getControllerGrip( 1 );
-			controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
-			scene.add( controllerGrip2 );
 
 			
 			window.addEventListener( 'resize', onWindowResize, false );
@@ -299,11 +293,6 @@
 				scene.add( gltf.scene );
 			
 			} );
-			
-			var walking = false;
-			var direction;
-			var distance = 0;
-			var alpha = 0;
 			
 			//	when pressing any arrow the character walks
 			document.addEventListener("keydown", function(e){
@@ -414,7 +403,6 @@
 					
 				
 				}
-			
 			
 				//////////////////
 				
