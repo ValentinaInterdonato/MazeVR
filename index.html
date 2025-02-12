@@ -99,10 +99,10 @@
 															emissive: new THREE.Color("rgb(255, 255, 0)")});
 				
 				compass = new THREE.Mesh(compass_geo, compass_mat);
-				compass.scale.set(1, 1, 1);
+				compass.scale.set(10, 10, 10);
 				compass.rotation.y = camera.rotation.y;
 				//compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
-				compass.position.set(camera.position.x , camera.position.y , camera.position.z - 1);
+				compass.position.set(camera.position.x , 0.1 , camera.position.z);
 				distance = Math.sqrt(Math.pow(pelvis_pos_x,2) + Math.pow(pelvis_pos_z,2));
 				alpha = Math.acos(pelvis_pos_z/distance);
 				compass.rotation.z = alpha - camera.rotation.y;
@@ -171,7 +171,6 @@
 				camera.position.y = INTERSECTION.y;
 				camera.position.z = INTERSECTION.z;				
 				compass = new THREE.Mesh(compass_geo, compass_mat);
-				compass.scale.set(1, 1, 1);
 				compass.rotation.y = camera.rotation.y;
 				//compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
 				compass.position.set(camera.position.x , 0.1 , camera.position.z );
