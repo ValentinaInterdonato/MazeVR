@@ -92,6 +92,26 @@
 				const transform = new XRRigidTransform( offsetPosition, offsetRotation );
 				const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace( transform );
 				renderer.xr.setReferenceSpace( teleportSpaceOffset );
+				//	compass pointing to the center of the maze
+				compass_geo = new THREE.PlaneGeometry(1,1);
+				compass_map = textureLoader.load( 'https://valentinainterdonato.github.io/models/arrow_yellow.png' );
+				compass_mat = new THREE.MeshLambertMaterial({map: compass_map, transparent: true, 
+															emissive: new THREE.Color("rgb(255, 255, 0)")});
+				
+				compass = new THREE.Mesh(compass_geo, compass_mat);
+				compass.scale.set(0.1, 0.1, 0.1);
+				//compass.rotation.y = camera.rotation.y;
+				//compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
+				compass.position.set(camera.position.x + 2.0, camera.position.y - 2.0, camera.position.z - 2.0);
+				distance = Math.sqrt(Math.pow(pelvis_pos_x,2) + Math.pow(pelvis_pos_z,2));
+				alpha = Math.acos(pelvis_pos_z/distance);
+				compass.rotation.z = alpha - camera.rotation.y;
+				if(pelvis_pos_x < 0){	
+					alpha = Math.acos(-pelvis_pos_z/distance);
+					compass.rotation.z = alpha - camera.rotation.y - Math.PI;
+				}
+				scene.add(compass);
+				
 			}
 			
 			var textureLoader = new THREE.TextureLoader();
