@@ -157,8 +157,7 @@
 					const transform = new XRRigidTransform( offsetPosition, offsetRotation );
 					const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace( transform );
 					
-					pelvis_pos_x = INTERSECTION.x;
-					pelvis_pos_z = INTERSECTION.z;
+					
 					compass.rotation.y = camera.rotation.y;
 					compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
 					distance = Math.sqrt(Math.pow(pelvis_pos_x,2) + Math.pow(pelvis_pos_z,2));
