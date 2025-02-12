@@ -102,7 +102,7 @@
 				compass.scale.set(0.1, 0.1, 0.1);
 				//compass.rotation.y = camera.rotation.y;
 				//compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
-				compass.position.set(camera.position.x + 2.0, camera.position.y - 2.0, camera.position.z - 2.0);
+				compass.position.set(camera.position.x , camera.position.y , camera.position.z);
 				distance = Math.sqrt(Math.pow(pelvis_pos_x,2) + Math.pow(pelvis_pos_z,2));
 				alpha = Math.acos(pelvis_pos_z/distance);
 				compass.rotation.z = alpha - camera.rotation.y;
