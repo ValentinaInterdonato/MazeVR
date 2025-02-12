@@ -169,7 +169,19 @@
 
 				}
 				
-				compass.position.set(camera.position.x, camera.position.y - 1.6, camera.position.z - 1);
+				compass = new THREE.Mesh(compass_geo, compass_mat);
+				compass.scale.set(1, 1, 1);
+				compass.rotation.y = camera.rotation.y;
+				//compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
+				compass.position.set(camera.position.x , camera.position.y , camera.position.z - 1);
+				distance = Math.sqrt(Math.pow(pelvis_pos_x,2) + Math.pow(pelvis_pos_z,2));
+				alpha = Math.acos(pelvis_pos_z/distance);
+				compass.rotation.z = alpha - camera.rotation.y;
+				if(pelvis_pos_x < 0){	
+					alpha = Math.acos(-pelvis_pos_z/distance);
+					compass.rotation.z = alpha - camera.rotation.y - Math.PI;
+				}
+				scene.add(compass);
 
 			}
 
