@@ -26,6 +26,7 @@
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
 			let room, marker, floor, baseReferenceSpace;
+			let compass, compass_geo, compass_map, compass_mat;
 			let INTERSECTION;
 			const tempMatrix = new THREE.Matrix4();
 			var walking = false;
@@ -96,12 +97,12 @@
 			var textureLoader = new THREE.TextureLoader();
 			
 			//	compass pointing to the center of the maze
-			var compass_geo = new THREE.PlaneGeometry(1,1);
-			var compass_map = textureLoader.load( 'https://valentinainterdonato.github.io/models/arrow_yellow.png' );
-			var compass_mat = new THREE.MeshLambertMaterial({map: compass_map, transparent: true, 
+			compass_geo = new THREE.PlaneGeometry(1,1);
+			compass_map = textureLoader.load( 'https://valentinainterdonato.github.io/models/arrow_yellow.png' );
+			compass_mat = new THREE.MeshLambertMaterial({map: compass_map, transparent: true, 
 														emissive: new THREE.Color("rgb(255, 255, 0)")});
 			
-			var compass = new THREE.Mesh(compass_geo, compass_mat);
+			compass = new THREE.Mesh(compass_geo, compass_mat);
 			compass.scale.set(0.1, 0.1, 0.1);
 			compass.rotation.y = camera.rotation.y;
 			compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
@@ -147,6 +148,8 @@
 					renderer.xr.setReferenceSpace( teleportSpaceOffset );
 
 				}
+				
+				compass.position.set(camera.position.x, camera.position.y - 1.6, camera.position.z - 1);
 
 			}
 
@@ -191,7 +194,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
-			
 			
 			function buildController( data ) {
 
@@ -318,15 +320,6 @@
 					}
 		
 			});
-			
-			
-			//if (baseReferenceSpace != undefined){
-			//	const offsetPosition = { x: camera.position.x, y: camera.position.y, z: camera.position.z, w: 1 };
-			//	const offsetRotation = new THREE.Quaternion();
-			//	const transform = new XRRigidTransform( offsetPosition, offsetRotation );
-			//	const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace( transform );
-			//	renderer.xr.setReferenceSpace( teleportSpaceOffset );
-			//}
 
 
 			function animate() {
