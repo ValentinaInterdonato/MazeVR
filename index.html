@@ -157,17 +157,16 @@
 					const transform = new XRRigidTransform( offsetPosition, offsetRotation );
 					const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace( transform );
 					
-					
+					camera.position.x = INTERSECTION.x;
+					camera.position.y = INTERSECTION.y;
+					camera.position.z = INTERSECTION.z;
 					compass.rotation.y = camera.rotation.y;
-					compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
-					distance = Math.sqrt(Math.pow(pelvis_pos_x,2) + Math.pow(pelvis_pos_z,2));
-					alpha = Math.acos(pelvis_pos_z/distance);
-					compass.rotation.z = alpha - camera.rotation.y;
-					if(pelvis_pos_x < 0){	
-						alpha = Math.acos(-pelvis_pos_z/distance);
-						compass.rotation.z = alpha - camera.rotation.y - Math.PI;
-					}
-					scene.add(compass);
+					//compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
+					compass.position.set(camera.position.x , 1.0, camera.position.z);
+					distance = Math.sqrt(Math.pow(camera.position.x,2) + Math.pow(camera.position.z,2));
+					alpha = Math.acos(camera.position.z/distance);
+					//compass.rotation.z = alpha - camera.rotation.y;
+					compass.rotation.z = Math.PI/2;
 						
 					renderer.xr.setReferenceSpace( teleportSpaceOffset );
 
