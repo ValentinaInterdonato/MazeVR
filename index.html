@@ -110,7 +110,6 @@
 					alpha = Math.acos(-pelvis_pos_z/distance);
 					compass.rotation.z = alpha - camera.rotation.y - Math.PI;
 				}
-				scene.add(compass);
 				
 			}
 			
@@ -168,7 +167,9 @@
 					renderer.xr.setReferenceSpace( teleportSpaceOffset );
 
 				}
-				
+				camera.position.x = INTERSECTION.x;
+				camera.position.y = INTERSECTION.y;
+				camera.position.z = INTERSECTION.z;				
 				compass = new THREE.Mesh(compass_geo, compass_mat);
 				compass.scale.set(1, 1, 1);
 				compass.rotation.y = camera.rotation.y;
@@ -181,7 +182,6 @@
 					alpha = Math.acos(-pelvis_pos_z/distance);
 					compass.rotation.z = alpha - camera.rotation.y - Math.PI;
 				}
-				scene.add(compass);
 
 			}
 
