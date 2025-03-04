@@ -35,12 +35,9 @@
 
 			scene = new THREE.Scene();
 			camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 0.1, 1000 );
-			//camera.position.y = 120;
-			//camera.position.z = 0;
-			//camera.lookAt(70, 70, 0);
-			//camera.position.x = 0;
+			camera.position.x = 0;
 			camera.position.y = 4;
-			//camera.position.z = 0;
+			camera.position.z = 0;
 			
 			raycaster = new THREE.Raycaster();
 			renderer = new THREE.WebGLRenderer();
@@ -50,33 +47,10 @@
 			
 			//put the camera in one of the corners
 			var corner = Math.random();
-			let pelvis_pos_x, pelvis_pos_z;
+			//let pelvis_pos_x, pelvis_pos_z;
+			var pelvis_pos_x = 0;
+			var pelvis_pos_z = 0;
 			var pelvis_rot_y = -Math.PI;
-				
-			if(corner < 0.25){
-				pelvis_pos_x = -75;
-				pelvis_pos_z = -75;
-				camera.position.x = -75;
-				camera.position.z = -70;
-			}	
-			else if(corner < 0.5){
-				pelvis_pos_x = 75;
-				pelvis_pos_z = -75;
-				camera.position.x = 75;
-				camera.position.z = -70;
-			}
-			else if(corner < 0.75){
-				pelvis_pos_x = -75;
-				pelvis_pos_z = 70;
-				camera.position.x = -75;
-				camera.position.z = 75;
-			}
-			else{
-				pelvis_pos_x = 75;
-				pelvis_pos_z = 70;
-				camera.position.x = 75;
-				camera.position.z = 75;
-			}
 			
 			//renderer.xr.addEventListener( 'sessionstart', () => baseReferenceSpace = renderer.xr.getReferenceSpace() );
 			renderer.xr.addEventListener( 'sessionstart', onSessionStart);
@@ -94,25 +68,6 @@
 			}
 			
 			var textureLoader = new THREE.TextureLoader();
-			
-			//	compass pointing to the center of the maze
-			var compass_geo = new THREE.PlaneGeometry(1,1);
-			var compass_map = textureLoader.load( 'https://valentinainterdonato.github.io/models/arrow_yellow.png' );
-			var compass_mat = new THREE.MeshLambertMaterial({map: compass_map, transparent: true, 
-														emissive: new THREE.Color("rgb(255, 255, 0)")});
-			
-			var compass = new THREE.Mesh(compass_geo, compass_mat);
-			compass.scale.set(0.1, 0.1, 0.1);
-			compass.rotation.y = camera.rotation.y;
-			compass.position.set(camera.position.x, camera.position.y - 0.6, camera.position.z - 1);
-			distance = Math.sqrt(Math.pow(pelvis_pos_x,2) + Math.pow(pelvis_pos_z,2));
-			alpha = Math.acos(pelvis_pos_z/distance);
-			compass.rotation.z = alpha - camera.rotation.y;
-			if(pelvis_pos_x < 0){	
-				alpha = Math.acos(-pelvis_pos_z/distance);
-				compass.rotation.z = alpha - camera.rotation.y - Math.PI;
-			}
-			scene.add(compass);
 			
 			marker = new THREE.Mesh(
 					new THREE.CircleGeometry( 0.25, 32 ).rotateX( - Math.PI / 2 ),
@@ -233,13 +188,6 @@
 			threeTone.minFilter = THREE.NearestFilter;
 			threeTone.magFilter = THREE.NearestFilter;
 			
-			// prize at the center
-			const trophyGeometry = new THREE.BoxGeometry( 1, 2, 1);
-			const mat_trophy =  new THREE.MeshToonMaterial( { color: 0xffff33, gradientMap:threeTone } );
-			var trophy = new THREE.Mesh(trophyGeometry, mat_trophy);
-			trophy.position.set(0, 1, 0);
-			scene.add(trophy);
-			
 			//	set environment materials
 			mat_column = new THREE.MeshToonMaterial( { color: 0xff0000, gradientMap:threeTone } );
 			mat_ceiling = new THREE.MeshToonMaterial( { color: 0x049EF4, gradientMap:threeTone } );
@@ -247,40 +195,42 @@
 			mat_pavement = new THREE.MeshToonMaterial( { color: 0x0000ff, gradientMap:threeTone } );
 			
 			//load geometries
-			loader.load( 'maze_A.gltf', function ( gltf ) {
-			
+			loader.load('maze_ceiling.glb', function ( gltf ) {
 				gltf.scene.traverse( function ( child ) {
-
-							if ( child.isMesh ) {
-
-								var mesh_name = child.name.substring(0,3);
-								if(mesh_name=='cap' || mesh_name=='sha' || mesh_name == 'bas'){
-								
-									child.material = mat_column;
-								
-								}
-								else if (mesh_name == 'cei'){
-								
-									child.material = mat_ceiling;
-								
-								}
-								else if (mesh_name == 'wal'){
-								
-									child.material = mat_wall;
-								
-								}
-								else{
-								
-									child.material = mat_pavement;
-								
-								}
-
-							}
-
-						} );
+					if (child.isMesh){
+						child.material = mat_ceiling;
+					}
+				});
 				scene.add( gltf.scene );
+			});
 			
-			} );
+			loader.load('maze_columns.glb', function ( gltf ) {
+				gltf.scene.traverse( function ( child ) {
+					if (child.isMesh){
+						child.material = mat_column;
+					}
+				});
+				scene.add( gltf.scene );
+			});
+			
+			loader.load('maze_walls.glb', function ( gltf ) {
+				gltf.scene.traverse( function ( child ) {
+					if (child.isMesh){
+						child.material = mat_wall;
+					}
+				});
+				scene.add( gltf.scene );
+			});
+			
+			loader.load('maze_floor.glb', function ( gltf ) {
+				gltf.scene.traverse( function ( child ) {
+					if (child.isMesh){
+						child.material = mat_pavement;
+					}
+				});
+				scene.add( gltf.scene );
+			});
+			
 			
 			//	when pressing any arrow the camera moves
 			document.addEventListener("keydown", function(e){
@@ -349,16 +299,6 @@
 							camera.rotation.y = pelvis_rot_y - Math.PI;
 							camera.position.x = pelvis_pos_x + 7 * Math.sin(camera.rotation.y);
 							camera.position.z = pelvis_pos_z + 7 * Math.cos(camera.rotation.y);
-							compass.position.x = pelvis_pos_x + 6 * Math.sin(camera.rotation.y);
-							compass.position.z = pelvis_pos_z + 6 * Math.cos(camera.rotation.y);
-							compass.rotation.y = camera.rotation.y;
-							distance = Math.sqrt(Math.pow(pelvis_pos_x,2) + Math.pow(pelvis_pos_z,2));
-							alpha = Math.acos(pelvis_pos_z/distance);
-							compass.rotation.z = alpha - camera.rotation.y;
-							if(pelvis_pos_x < 0){	
-								alpha = Math.acos(-pelvis_pos_z/distance);
-								compass.rotation.z = alpha - camera.rotation.y - Math.PI;
-							}
 							break;
 						
 						case "right":
@@ -366,16 +306,6 @@
 							camera.rotation.y = pelvis_rot_y - Math.PI;
 							camera.position.x = pelvis_pos_x + 7 * Math.sin(camera.rotation.y);
 							camera.position.z = pelvis_pos_z + 7 * Math.cos(camera.rotation.y);
-							compass.position.x = pelvis_pos_x + 6 * Math.sin(camera.rotation.y);
-							compass.position.z = pelvis_pos_z + 6 * Math.cos(camera.rotation.y);
-							compass.rotation.y = camera.rotation.y;
-							distance = Math.sqrt(Math.pow(pelvis_pos_x,2) + Math.pow(pelvis_pos_z,2));
-							alpha = Math.acos(pelvis_pos_z/distance);
-							compass.rotation.z = alpha - camera.rotation.y;
-							if(pelvis_pos_x < 0){	
-								alpha = Math.acos(-pelvis_pos_z/distance);
-								compass.rotation.z = alpha - camera.rotation.y - Math.PI;		
-							}
 							break;
 							
 						case "forward":
@@ -384,16 +314,6 @@
 							camera.rotation.y = pelvis_rot_y - Math.PI;
 							camera.position.x = pelvis_pos_x + 7 * Math.sin(camera.rotation.y);
 							camera.position.z = pelvis_pos_z + 7 * Math.cos(camera.rotation.y);
-							compass.position.x = pelvis_pos_x + 6 * Math.sin(camera.rotation.y);
-							compass.position.z = pelvis_pos_z + 6 * Math.cos(camera.rotation.y);
-							compass.rotation.y = camera.rotation.y;
-							distance = Math.sqrt(Math.pow(pelvis_pos_x,2) + Math.pow(pelvis_pos_z,2));
-							alpha = Math.acos(pelvis_pos_z/distance);
-							compass.rotation.z = alpha - camera.rotation.y;
-							if(pelvis_pos_x < 0){								
-								alpha = Math.acos(-pelvis_pos_z/distance);
-								compass.rotation.z = alpha - camera.rotation.y - Math.PI;		
-							}
 							break;
 
 					}
