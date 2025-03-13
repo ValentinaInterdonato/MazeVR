@@ -200,6 +200,9 @@
 				gltf.scene.traverse( function ( child ) {
 					if (child.isMesh){
 						child.material = mat_ceiling;
+						child.scale.x = 0.5;
+						child.scale.y = 0.5;
+						child.scale.z = 0.5;
 					}
 				});
 				scene.add( gltf.scene );
@@ -209,6 +212,9 @@
 				gltf.scene.traverse( function ( child ) {
 					if (child.isMesh){
 						child.material = mat_column;
+						child.scale.x = 0.5;
+						child.scale.y = 0.5;
+						child.scale.z = 0.5;
 					}
 				});
 				scene.add( gltf.scene );
@@ -218,6 +224,9 @@
 				gltf.scene.traverse( function ( child ) {
 					if (child.isMesh){
 						child.material = mat_wall;
+						child.scale.x = 0.5;
+						child.scale.y = 0.5;
+						child.scale.z = 0.5;
 					}
 				});
 				scene.add( gltf.scene );
@@ -227,6 +236,9 @@
 				gltf.scene.traverse( function ( child ) {
 					if (child.isMesh){
 						child.material = mat_pavement;
+						child.scale.x = 0.5;
+						child.scale.y = 0.5;
+						child.scale.z = 0.5;
 					}
 				});
 				scene.add( gltf.scene );
