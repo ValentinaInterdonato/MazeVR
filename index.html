@@ -35,7 +35,7 @@
 			var alpha = 0;
 
 			scene = new THREE.Scene();
-			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			camera = new THREE.PerspectiveCamera( 85, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			camera.position.x = 0;
 			camera.position.y = 2;
 			camera.position.z = 0;
@@ -200,9 +200,6 @@
 				gltf.scene.traverse( function ( child ) {
 					if (child.isMesh){
 						child.material = mat_ceiling;
-						child.scale.x = 0.5;
-						child.scale.y = 0.5;
-						child.scale.z = 0.5;
 					}
 				});
 				scene.add( gltf.scene );
@@ -212,9 +209,6 @@
 				gltf.scene.traverse( function ( child ) {
 					if (child.isMesh){
 						child.material = mat_column;
-						child.scale.x = 0.5;
-						child.scale.y = 0.5;
-						child.scale.z = 0.5;
 					}
 				});
 				scene.add( gltf.scene );
@@ -224,9 +218,6 @@
 				gltf.scene.traverse( function ( child ) {
 					if (child.isMesh){
 						child.material = mat_wall;
-						child.scale.x = 0.5;
-						child.scale.y = 0.5;
-						child.scale.z = 0.5;
 					}
 				});
 				scene.add( gltf.scene );
@@ -236,9 +227,6 @@
 				gltf.scene.traverse( function ( child ) {
 					if (child.isMesh){
 						child.material = mat_pavement;
-						child.scale.x = 0.5;
-						child.scale.y = 0.5;
-						child.scale.z = 0.5;
 					}
 				});
 				scene.add( gltf.scene );
