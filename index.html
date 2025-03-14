@@ -11,17 +11,17 @@
 		<script type="importmap">
 			{
 				"imports": {
-				"three": "https://unpkg.com/three@0.174.0/build/three.module.js",
-				"three/addons/": "https://unpkg.com/three@0.174.0/examples/jsm/"
+				"three": "https://unpkg.com/three/build/three.module.js",
+				"three/addons/": "https://unpkg.com/three/examples/jsm/"
 				}
 			  }
 		</script>
 		<script type="module" >
 			import * as THREE from 'three';
-			import { GLTFLoader } from './lib/GLTFLoader.js';
-			//import { VRButton } from './lib/VRButton.js';
-			import { ARButton } from './lib/ARButton.js';
-			import { XRControllerModelFactory } from './lib/XRControllerModelFactory.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			//import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { ARButton } from 'three/addons/webxr/ARButton.js';
+			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
 			let camera, scene, raycaster, renderer;
 			let controller1, controller2;
