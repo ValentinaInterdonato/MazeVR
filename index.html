@@ -35,9 +35,9 @@
 			var alpha = 0;
 
 			scene = new THREE.Scene();
-			camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			camera.position.x = 0;
-			camera.position.y = 2;
+			camera.position.y = 4;
 			camera.position.z = 0;
 			
 			raycaster = new THREE.Raycaster();
@@ -179,7 +179,17 @@
 			//	lights
 			const light1 = new THREE.DirectionalLight( 0xffffff, 3 );
 			light1.position.set( 200, 200, 0 );
-			scene.add( light1 );			
+			//scene.add( light1 );	
+
+
+			let threeDirectionalLight = new THREE.DirectionalLight();
+			scene.add(threeDirectionalLight);
+			// THREE.LightProbe is Three.js' spherical harmonics-based light type.
+			let threeLightProbe = new THREE.LightProbe();
+			scene.add(threeLightProbe);
+			let lightProbe = await xrSession.requestLightProbe();
+
+			
 			
 			// instantiate a loader
 			const loader = new GLTFLoader().setPath( 'https://valentinainterdonato.github.io/models/' );
@@ -205,14 +215,14 @@
 				scene.add( gltf.scene );
 			});
 			
-			/*loader.load('maze_columns.glb', function ( gltf ) {
+			loader.load('maze_columns.glb', function ( gltf ) {
 				gltf.scene.traverse( function ( child ) {
 					if (child.isMesh){
 						child.material = mat_column;
 					}
 				});
 				scene.add( gltf.scene );
-			});*/
+			});
 			
 			loader.load('maze_walls.glb', function ( gltf ) {
 				gltf.scene.traverse( function ( child ) {
@@ -278,7 +288,26 @@
 			//	const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace( transform );
 			//	renderer.xr.setReferenceSpace( teleportSpaceOffset );
 			//}
+			function onXRFrame(t, xrFrame) {
+				let lightEstimate = xrFrame.getLightEstimate(lightProbe);
 
+				let intensity = Math.max(1.0,
+								Math.max(lightEstimate.primaryLightIntensity.x,
+								Math.max(lightEstimate.primaryLightIntensity.y,
+										lightEstimate.primaryLightIntensity.z)));
+
+				threeDirectionalLight.position.set(lightEstimate.primaryLightDirection.x,
+												 lightEstimate.primaryLightDirection.y,
+												 lightEstimate.primaryLightDirection.z);
+				threeDirectionalLight.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity,
+												 lightEstimate.primaryLightIntensity.y / intensity,
+												 lightEstimate.primaryLightIntensity.z / intensity);
+				threeDirectionalLight.intensity = intensity;
+
+				threeLightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
+
+				// ... other typical frame loop stuff.
+			}
 
 			function animate() {
 			
