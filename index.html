@@ -27,7 +27,8 @@
 			import * as THREE from "./lib/three.module.js";
 			import { GLTFLoader } from './lib/GLTFLoader.js';
 			//import { VRButton } from './lib/VRButton.js';
-			import { ARButton } from './lib/ARButton.js';
+			//import { ARButton } from './lib/ARButton.js';
+			import { XRButton } from './lib/XRButton.js';
 			import { XRControllerModelFactory } from './lib/XRControllerModelFactory.js';
 			
 			 
@@ -65,7 +66,7 @@
 			renderer.xr.addEventListener( 'sessionstart', onSessionStart);
 			renderer.xr.enabled = true;
 			document.body.appendChild( renderer.domElement );
-			document.body.appendChild( ARButton.createButton( renderer ) );
+			//document.body.appendChild( ARButton.createButton( renderer ) );
 			
 			
 			function onSessionStart(){
@@ -192,13 +193,21 @@
 
 
 			
-			// Using Three.js to demonstrate
-			let threeDirectionalLight = new THREE.DirectionalLight();
-			// THREE.LightProbe is Three.js' spherical harmonics-based light type.
-			let threeLightProbe = new THREE.LightProbe();
-			let lightProbe = await xrSession.requestLightProbe();
-			scene.add( threeDirectionalLight );
-			scene.add( threeLightProbe );
+			const xrLight = new XREstimatedLight( renderer );
+			
+			xrLight.addEventListener( 'estimationstart' , () => {
+				scene.add( xrLight );
+				if ( xrLight.environment ) {
+					scene.environment = xrLight.environment;
+				}
+			} );
+			
+			xrLight.addEventListener( 'estimationend', () => {
+				scene.remove( xrLight );
+				scene.environment = null;
+			} );
+
+			document.body.appendChild( XRButton.createButton( renderer, {optionalFeatures: [ 'light-estimation' ]} ) );
 			
 			
 			// instantiate a loader
@@ -310,27 +319,6 @@
 			//	const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace( transform );
 			//	renderer.xr.setReferenceSpace( teleportSpaceOffset );
 			//}
-
-
-
-			function onXRFrame(t, xrFrame) {
-				let lightEstimate = xrFrame.getLightEstimate(lightProbe);
-			
-				let intensity = Math.max(1.0,
-			        		Math.max(lightEstimate.primaryLightIntensity.x,
-			                  	Math.max(lightEstimate.primaryLightIntensity.y,
-			                           	lightEstimate.primaryLightIntensity.z)));
-			
-				threeDirectionalLight.position.set(lightEstimate.primaryLightDirection.x,
-			        				lightEstimate.primaryLightDirection.y,
-			                                     	lightEstimate.primaryLightDirection.z);
-				threeDirectionalLight.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity,
-			                                     	lightEstimate.primaryLightIntensity.y / intensity,
-			                                     	lightEstimate.primaryLightIntensity.z / intensity);
-				threeDirectionalLight.intensity = intensity;
-			
-				threeLightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
-			}
 
 
 			function animate() {
