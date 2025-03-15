@@ -171,8 +171,13 @@
 			
 			//	set environment materials
 			mat_column = new THREE.MeshToonMaterial( { color: 0xff0000, gradientMap:threeTone } );
+			
 			mat_ceiling = new THREE.MeshToonMaterial( { color: 0x049EF4, gradientMap:threeTone } );
-			mat_wall = new THREE.MeshToonMaterial( { color: 0x00ff00, gradientMap:threeTone } );
+			
+			//mat_wall = new THREE.MeshToonMaterial( { color: 0x00ff00, gradientMap:threeTone } );
+			color_map = textureLoader.load('https://valentinainterdonato.github.io/models/stone_color.png');
+			mat_wall = new THREE.MeshToonMaterial( { map: color_map, gradientMap:threeTone } );
+			
 			mat_pavement = new THREE.MeshToonMaterial( { color: 0x0000ff, gradientMap:threeTone } );
 			
 			//load geometries
