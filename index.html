@@ -176,7 +176,7 @@
 			mat_pavement = new THREE.MeshToonMaterial( { color: 0x0000ff, gradientMap:threeTone } );
 			
 			//load geometries
-			loader.load('maze_ceiling.glb', function ( gltf ) {
+			/*loader.load('maze_ceiling.glb', function ( gltf ) {
 				gltf.scene.traverse( function ( child ) {
 					if (child.isMesh){
 						child.material = mat_ceiling;
@@ -198,9 +198,10 @@
 					}
 				});
 				scene.add( gltf.scene );
-			});
+			});*/
 			
-			loader.load('maze_walls.glb', function ( gltf ) {
+			//loader.load('maze_walls.glb', function ( gltf ) {
+			loader.load('walls_textured.glb', function ( gltf ) {
 				gltf.scene.traverse( function ( child ) {
 					if (child.isMesh){
 						child.material = mat_wall;
