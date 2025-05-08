@@ -175,28 +175,28 @@
 			//mat_column = new THREE.MeshToonMaterial( { map: color_map, gradientMap:threeTone } );
 			//mat_column = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff, shininess: 80} );
 			//mat_column = new THREE.MeshPhongMaterial( { specular: 0xffffff, shininess: 40} );
-			mat_column = new THREE.MeshPhysicalMaterial({color: 0xff0000, metalness: 0.0, roughness: 0.0, reflectivity:0.0});
+			mat_column = new THREE.MeshPhysicalMaterial({color: 0xff0000, metalness: 0.0});
 			
 			//mat_ceiling = new THREE.MeshToonMaterial( { color: 0x049EF4, gradientMap:threeTone } );
 			//color_map = textureLoader.load('https://valentinainterdonato.github.io/models/ceiling_color_250.jpg');
 			//mat_ceiling = new THREE.MeshToonMaterial( { map: color_map, gradientMap:threeTone } );
 			//mat_ceiling = new THREE.MeshPhongMaterial( { color: 0x049EF4, specular: 0xffffff, shininess: 80} );
 			//mat_ceiling = new THREE.MeshPhongMaterial( { specular: 0xffffff, shininess: 40} );
-			mat_ceiling = new THREE.MeshPhysicalMaterial({color: 0x049EF4, metalness: 0.0, roughness: 0.0, reflectivity:0.0});
+			mat_ceiling = new THREE.MeshPhysicalMaterial({color: 0x049EF4});
 			
 			//mat_wall = new THREE.MeshToonMaterial( { color: 0x00ff00, gradientMap:threeTone } );
 			//color_map = textureLoader.load('https://valentinainterdonato.github.io/models/stone_color_250.jpg');
 			//mat_wall = new THREE.MeshToonMaterial( { map: color_map, gradientMap:threeTone } );
 			//mat_wall = new THREE.MeshPhongMaterial( { color: 0x00ff00, specular: 0xffffff, shininess: 80} );
 			//mat_wall = new THREE.MeshPhongMaterial( { specular: 0xffffff, shininess: 40} );
-			mat_wall = new THREE.MeshPhysicalMaterial({color: 0x00ff00, metalness: 0.0, roughness: 0.0, reflectivity:0.0});
+			mat_wall = new THREE.MeshPhysicalMaterial({color: 0x00ff00});
 			
 			//mat_pavement = new THREE.MeshToonMaterial( { color: 0x0000ff, gradientMap:threeTone } );
 			//color_map = textureLoader.load('https://valentinainterdonato.github.io/models/pavement_color_250.jpg');
 			//mat_pavement = new THREE.MeshToonMaterial( { map: color_map, gradientMap:threeTone } );
 			//mat_pavement = new THREE.MeshPhongMaterial( { color: 0x0000ff, specular: 0xffffff, shininess: 80} );
 			//mat_pavement = new THREE.MeshPhongMaterial( {  color: 0x222222, specular: 0xffffff, shininess: 40} );
-			mat_pavement = new THREE.MeshPhysicalMaterial({color: 0x0000ff, metalness: 0.0, roughness: 0.0, reflectivity:0.0});
+			mat_pavement = new THREE.MeshPhysicalMaterial({color: 0x0000ff});
 			
 			//load geometries
 			loader.load('maze_ceiling.glb', function ( gltf ) {
