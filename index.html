@@ -203,7 +203,7 @@
 			//loader.load('ceiling_textured.glb', function ( gltf ) {
 				gltf.scene.traverse( function ( child ) {
 					if (child.isMesh){
-						//child.material = mat_ceiling;
+						child.material = mat_ceiling;
 						child.scale.x = 0.5;
 						child.scale.y = 0.5;
 						child.scale.z = 0.5;
@@ -216,7 +216,7 @@
 			//loader.load('columns_textured.glb', function ( gltf ) {
 				gltf.scene.traverse( function ( child ) {
 					if (child.isMesh){
-						//child.material = mat_column;
+						child.material = mat_column;
 						child.scale.x = 0.5;
 						child.scale.y = 0.5;
 						child.scale.z = 0.5;
@@ -229,7 +229,7 @@
 			//loader.load('walls_textured.glb', function ( gltf ) {
 				gltf.scene.traverse( function ( child ) {
 					if (child.isMesh){
-						//child.material = mat_wall;
+						child.material = mat_wall;
 						child.scale.x = 0.5;
 						child.scale.y = 0.5;
 						child.scale.z = 0.5;
